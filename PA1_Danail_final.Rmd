@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "Reproducible Research: Peer Assessment 1"
 subtitle: "Peer Grated Assignment 1"
@@ -95,3 +96,102 @@ newD %>% mutate(weekend= factor(ifelse(lubridate::wday(date) %in% c(1, 7),"Weeke
   ggplot(., aes(x=interval,y=newSteps)) +stat_summary(fun.y = "mean",geom = "line")+facet_grid(weekend~.)
 
 ```
+=======
+---
+title: "Reproducible Research: Peer Assessment 1"
+subtitle: "Peer Grated Assignment 1"
+author: "Batman"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+## Loading and preprocessing the data
+
+```{r loadingData, echo=TRUE}
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+data <- read.table(unz("C:/Users/hrist499/Documents/Coursera/DataScience/RepData_PeerAssessment1/activity.zip",
+                       "activity.csv"),
+                   header = TRUE,sep=",")
+d<-tbl_df(data)
+d$date<-ymd(d$date)
+str(d)
+```
+
+## What is mean total number of steps taken per day?
+```{r mean, echo=TRUE}
+ggplot(d, aes(steps))+geom_histogram(na.rm = TRUE,bins=50)
+
+```
+
+Summary:
+
+Mean  of number of steps per day is:
+```{r mn, echo=TRUE}
+mean(d$steps,na.rm=TRUE) 
+```         
+Median number of steps per day is:
+
+```{r md, echo=TRUE}
+median(d$steps,na.rm=TRUE) 
+```
+
+## What is the average daily activity pattern?
+
+
+
+```{r dailyPatern,echo=TRUE}
+ggplot(d, aes(x=interval,y=steps)) +stat_summary(fun.y = "mean",geom = "line")
+summaryRes<- d %>%  group_by(interval) %>% summarize_all(mean,na.rm=TRUE)
+intrv<-summaryRes[which.max(summaryRes$steps),"interval"]
+stps<-summaryRes[which.max(summaryRes$steps),"steps"]
+```
+
+The interval with the maximum number of steps summarized over all days is ```r intrv ``` with ```r stps``` steps.
+
+## Imputing missing values
+ 
+ The number of missing values in the data can be seen in the data summary:
+```{r , echo=TRUE}
+summary(d)
+```
+We are going to impute the missing values with the average value per interval that we have calculated in the previous section.
+For this we are going to create a new variable called *newSteps*.
+
+```{r, echo=TRUE}
+newD<-d %>% group_by(interval) %>% mutate(newSteps=ifelse(is.na(steps),mean(steps,na.rm = TRUE),steps) )
+newD
+```
+
+The histogram of the new steps variable is visible in the picture below:
+```{r , echo=TRUE}
+ggplot(newD, aes(newSteps))+geom_histogram(na.rm = TRUE,bins=50)
+
+```
+
+Mean  of number of steps per day is:
+```{r , echo=TRUE}
+mean(newD$newSteps,na.rm=TRUE) 
+```         
+
+Median number of steps per day is:
+
+```{r , echo=TRUE}
+median(newD$newSteps,na.rm=TRUE) 
+```
+In our case we do not observe a change in the mean value because we substitute the missing values with the average per 5 minutes interval which will not change the mean value. Because the data set has more than 50% zeroes  we see that substituting 2303  missing values does not change the median value as well. however the distribution is different as you can see in the value of the 3rd quadrant from the summary of the *newSteps* column.
+```{r, echo=TRUE}
+summary(newD)
+```
+## Are there differences in activity patterns between weekdays and weekends?
+Creating the weekend variable.
+
+```{r, echo=TRUE}
+newD %>% mutate(weekend= factor(ifelse(lubridate::wday(date) %in% c(1, 7),"Weekend","weekday"))) %>% 
+  ggplot(., aes(x=interval,y=newSteps)) +stat_summary(fun.y = "mean",geom = "line")+facet_grid(weekend~.)
+
+```
+>>>>>>> f9b1436421d51e7af2891536abd40551ef52d607
